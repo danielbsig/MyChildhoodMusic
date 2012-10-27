@@ -7,10 +7,13 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.9.0/themes/dark-hive/jquery-ui.css" />
 
     <script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
-    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.1.0.js"></script>
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.9.0/jquery-ui.js"></script>
 
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.1.0.js"></script>
+    <script src="http://cdn-files.deezer.com/js/min/dz.js"></script>
     <title>My Childhood Music</title>
   </head>
 
@@ -45,27 +48,36 @@
         <tfoot></tfoot>
         <tbody data-bind="foreach: songs">
           <tr>
-            <td data-bind="text: title"></td>
-            <td data-bind="text: artist"></td>
+            <td data-bind="text: song"></td>
+            <td data-bind="text: performer"></td>
+            <td><button data-bind="click: $root.onListen">Listen</button></td>
           </tr>
         </tbody>
     </table>
 
-    
+    <div id="dzPlayer" data-bind="visible: isPlaying">
+    </div>
 
     <script type="text/javascript">
 
-      function Song( title, artist ){
-        this.title = ko.observable( title );
-        this.artist = ko.observable( artist );
+      function replaceSpaces( str ){
+        return str.replace( " ", "+" );
+      }
+
+      function Song( title, artist, dt, weeks ){
+        this.song      = ko.observable( title );
+        this.performer = ko.observable( artist );
+        this.date      = ko.observable( dt );
+        this.weeks     = ko.observable( weeks );
       }
 
       var ViewModel = function( ){
         var self = this;
 
+        self.isPlaying       = ko.observable( false );
         self.ageInputVisible = ko.observable( "true" );
-        self.birthYear = ko.observable("1973");
-        self.songs     = ko.observableArray( [] );
+        self.birthYear       = ko.observable("1973");
+        self.songs           = ko.observableArray( [] );
 
         self.hasSongs  = ko.computed( function( ){
             return self.songs().length > 0;
@@ -73,13 +85,60 @@
 
         self.onEnterAge = function( ){
           self.ageInputVisible( false );
-          self.songs.push( new Song( "My Life", "Billy Joel" ) );
+          var year = parseInt( self.birthYear( ) );
+          year = year + 5; 
+          var theUrl = "http://mychildhoodmusic.isproject.is/music/get-top-songs-by-year/year/" + year;
+      
+          $.ajax( { 
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            url: theUrl,
+            data: "{}",
+            dataType: "jsonp",
+            crossDomain: true,
+            success: function( data ){
+              for ( var i = 0; i < data.length; i++ ){
+                var s = data[i];
+                self.songs.push( new Song( s.song, s.performer, s.date, s.weeks ) ) ;
+              }
+
+            },
+            error: function( xhr, ob, err ) {
+                console.log( "readyState: " + xhr.readyState +
+                       "\nstatus: " + xhr.status + ob + "\n" + err );
+            }
+          } );
         };
 
+        self.onListen = function( song ){
+          var params = replaceSpaces( song.artist( ) ) + "+" + replaceSpaces( song.title( ) );
+          console.log( params );
+          var url = "http://api.deezer.com/2.0/search?q=" + params + "&output=jsonp&callback=?";
+          $.getJSON( url, function( data ){
+            if ( data.length > 0 ){
+              var result = data[0];
+              self.isPlaying( true );
+            }
+          });
+          // http://developer.echonest.com/api/v4/artist/hotttnesss?api_key=FILDTEOIK2HBORODV&name=lady+gaga&format=jsonp&callback=myJsonpCallback
+        };
       };
 
       ko.applyBindings( new ViewModel( ) );
 
     </script>
+    <div id="dz-root"></div>
+    <script src="http://cdn-files.deezer.com/js/min/dz.js"></script>
+    <script>
+      DZ.init({
+        appId  : '107931',
+        channelUrl : 'http://danielbsig.github.com/MyChildhoodMusic/deezer.html',
+        player: {
+          container: "dzPlayer",
+          cover : true,
+          onload : function(){}
+        }
+      });
+    </script>   
   </body>
 </html>
