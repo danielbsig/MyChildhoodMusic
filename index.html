@@ -117,7 +117,7 @@
           $.getJSON( url, function( obj ){
             console.log( obj );
             if ( obj.data.length > 0 ){
-              var result = data[0];
+              var result = obj.data[0];
               self.isPlaying( true );
 
               DZ.player.playTracks( [ result.id ] );
