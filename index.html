@@ -111,13 +111,16 @@
         };
 
         self.onListen = function( song ){
-          var params = replaceSpaces( song.artist( ) ) + "+" + replaceSpaces( song.title( ) );
+          var params = replaceSpaces( song.performer( ) ) + "+" + replaceSpaces( song.song( ) );
           console.log( params );
           var url = "http://api.deezer.com/2.0/search?q=" + params + "&output=jsonp&callback=?";
-          $.getJSON( url, function( data ){
-            if ( data.length > 0 ){
+          $.getJSON( url, function( obj ){
+            console.log( obj );
+            if ( obj.data.length > 0 ){
               var result = data[0];
               self.isPlaying( true );
+
+              DZ.player.playTracks( [ result.id ] );
             }
           });
           // http://developer.echonest.com/api/v4/artist/hotttnesss?api_key=FILDTEOIK2HBORODV&name=lady+gaga&format=jsonp&callback=myJsonpCallback
