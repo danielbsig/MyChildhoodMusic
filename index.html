@@ -43,6 +43,7 @@
             <tr>
                 <th>Song</th>
                 <th>Artist</th>
+                <th>Operations</th>
             </tr>
         </thead>
         <tfoot></tfoot>
@@ -50,7 +51,10 @@
           <tr>
             <td data-bind="text: song"></td>
             <td data-bind="text: performer"></td>
-            <td><button data-bind="click: $root.onListen">Listen</button></td>
+            <td>
+              <button data-bind="click: $root.onListen">Listen</button>
+              <button data-bind="click: $root.dislike">Not my cup of tea</button>
+            </td>
           </tr>
         </tbody>
     </table>
@@ -125,6 +129,10 @@
           });
           // http://developer.echonest.com/api/v4/artist/hotttnesss?api_key=FILDTEOIK2HBORODV&name=lady+gaga&format=jsonp&callback=myJsonpCallback
         };
+
+        self.dislike = function( song ){
+          self.songs.remove( song );
+        }
       };
 
       ko.applyBindings( new ViewModel( ) );
