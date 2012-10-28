@@ -35,6 +35,11 @@
     <div id="ageInput" data-bind="visible: ageInputVisible">
       <label for="txtAge">In what year were you born?</label>
       <input type="text" id="txtAge" name="txtAge" data-bind="value: birthYear"/>
+      <p>
+          <label for="amount">At what age did you start to remember music?</label>
+          <input type="text" id="amount" />
+      </p>
+      <div id="slider-range-max"></div>
       <button data-bind="click: onEnterAge">Submit</button>
     </div>
 
@@ -51,6 +56,7 @@
             <td data-bind="text: song"></td>
             <td data-bind="text: performer"></td>
             <td><button data-bind="click: $root.onListen">Listen</button></td>
+            <td><button data-bind="click: $root.onRadio">Radio</button></td>
           </tr>
         </tbody>
     </table>
@@ -86,7 +92,7 @@
         self.onEnterAge = function( ){
           self.ageInputVisible( false );
           var year = parseInt( self.birthYear( ) );
-          year = year + 5; 
+          year = $( "#amount" ).val( ui.value ); 
           var theUrl = "http://mychildhoodmusic.isproject.is/music/get-top-songs-by-year/year/" + year;
       
           $.ajax( { 
@@ -98,7 +104,6 @@
             crossDomain: true,
             success: function( data ){
               for ( var i = 0; i < data.length; i++ ){
-                var s = data[i];
                 self.songs.push( new Song( s.song, s.performer, s.date, s.weeks ) ) ;
               }
 
@@ -109,6 +114,19 @@
             }
           } );
         };
+
+        self.findSimilarArtists = function( song ){
+          var params = replaceSpaces( song.performer );
+          var url = "http://developer.echonest.com/api/v4/artist/similar?api_key=FILDTEOIK2HBORODV&name=" + params + "&format=json&results=10&start=0&min_familiarity=.7";
+          $.getJSON( url, function( obj ){
+            console.log(obj);
+            if( obj.data.length > 0){
+              for (var i = 0; i <= obj.data.length - 1; i++) {
+                console.log(obj.data[i]);
+              };
+            }
+          });
+        }
 
         self.onListen = function( song ){
           var params = replaceSpaces( song.performer( ) ) + "+" + replaceSpaces( song.song( ) );
@@ -126,6 +144,19 @@
           // http://developer.echonest.com/api/v4/artist/hotttnesss?api_key=FILDTEOIK2HBORODV&name=lady+gaga&format=jsonp&callback=myJsonpCallback
         };
       };
+
+      $(function() {
+        $( "#slider-range-max" ).slider({
+            range: "max",
+            min: 2,
+            max: 20,
+            value: 5,
+            slide: function( event, ui ) {
+                $( "#amount" ).val( ui.value );
+            }
+        });
+        $( "#amount" ).val( $( "#slider-range-max" ).slider( "value" ) );
+    });
 
       ko.applyBindings( new ViewModel( ) );
 
