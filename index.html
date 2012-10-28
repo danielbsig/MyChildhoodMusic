@@ -48,7 +48,7 @@
         <thead>
             <tr>
                 <th>Song</th>
-                <th>Artist</th>
+                <th><a href="#" data-bind="click: sortByArtists">Artist</a></th>
                 <th>Operations</th>
             </tr>
         </thead>
@@ -59,8 +59,12 @@
             <td data-bind="text: performer"></td>
             <td>
               <a href="#" class="playbutton" data-bind="click: $root.onListen"><img alt="Play" src="images/play_rollover.png"/></a>
+              <a href="#" class="playbutton" data-bind="click: $root.onDislike"><img alt="Not my cup of tea" src="images/ThumbsDown.png"/></a>
+              <a href="#" class="playbutton" data-bind="click: $root.onLike"><img alt="Like it!" src="images/ThumbsUp.png"/></a>
+              <!--
               <button data-bind="click: $root.dislike">Not my cup of tea</button>
               <button data-bind="click: $root.like">Like it!</button>
+            -->
             </td>
           </tr>
         </tbody>
@@ -122,22 +126,60 @@
           } );
         };
 
+        self.onDislike = function( song ){
+          self.songs.remove( song );
+        };
+
+        self.onLike = function( song ){
+          self.findSimilarArtists( song );
+        };
+
+        self.sortByArtists = function(){
+          self.songs.sort(function( left, right ){
+            return left.performer().toLowerCase() === right.performer().toLowerCase() ? 0 : ( left.performer().toLowerCase() < right.performer().toLowerCase() ? -1 : 1 );
+          });
+        }
+
         self.findSimilarArtists = function( song ){
-          var params = replaceSpaces( song.performer );
-          var url = "http://developer.echonest.com/api/v4/artist/similar?api_key=FILDTEOIK2HBORODV&name=" + params + "&format=json&results=10&start=0&min_familiarity=.7";
+          var params = replaceSpaces( song.performer( ) );
+          var url = "http://developer.echonest.com/api/v4/artist/similar?api_key=FILDTEOIK2HBORODV&name=" + params + "&format=json&results=5&start=0&min_familiarity=.7";
           $.getJSON( url, function( obj ){
-            console.log(obj);
-            if( obj.data.length > 0){
-              for (var i = 0; i <= obj.data.length - 1; i++) {
-                console.log(obj.data[i]);
+            console.log( "Inside findSimilarArtists:");
+            console.log( obj );
+            if( obj.response.artists.length > 0){
+              for (var i = 0; i <= obj.response.artists.length - 1; i++) {
+                //Add the Artists to the view for dispay
+                self.findArtistSongs( obj.response.artists[i].id );
               };
             }
           });
-        };
+        }
 
         self.findArtistSongs = function( artist ){
-          var url = "http://developer.echonest.com/api/v4/song/search?api_key=FILDTEOIK2HBORODV&artist_id=" + artist + "&song_min_hotttnesss=.4&results=5";
-        };
+          var url = "http://developer.echonest.com/api/v4/song/search?api_key=FILDTEOIK2HBORODV&artist_id=" + artist + "&song_min_hotttnesss=.4&results=2";
+          $.getJSON( url, function( obj ){
+            console.log( "Inside findArtistSongs:");
+            console.log( obj );
+            if(obj.response.songs.length > 0){
+              for( var i = 0; i <= obj.response.songs.length - 1; i++ ){
+                //Search for the song on Deezer
+                //var url = "http://api.deezer.com/2.0/search?q=" + artist + replaceSpaces( obj.response.songs[i].title ) + "&output=jsonp&callback=?";
+                // Add the song to a playlist and play the song
+                // console.log( obj.response.songs[i] );
+                var s = obj.response.songs[i];
+                var song = new Song( s.title, s.artist_name, "", "" );
+
+                var match = ko.utils.arrayFirst( self.songs(), function(item) {
+                    return song.song( ).toLowerCase( ) === item.song( ).toLowerCase( );
+                });
+
+                if (!match) {
+                  self.songs.push( song );
+                }
+              }
+            }
+          });
+        }
 
         self.findArtistBio = function( song ){
           var params = replaceSpaces( song.performer );
@@ -164,10 +206,6 @@
           });
           // http://developer.echonest.com/api/v4/artist/hotttnesss?api_key=FILDTEOIK2HBORODV&name=lady+gaga&format=jsonp&callback=myJsonpCallback
         };
-
-        self.dislike = function( song ){
-          self.songs.remove( song );
-        }
       };
 
       $(function() {
