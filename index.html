@@ -11,6 +11,7 @@
 
     <script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.9.0/jquery-ui.js"></script>
+    <script type="text/javascript" src="javascripts/jquery.purr.js" ></script>
 
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.1.0.js"></script>
     <script src="http://cdn-files.deezer.com/js/min/dz.js"></script>
@@ -44,6 +45,7 @@
     </div>
 
 <div id="main" style="width: 100%">
+    <p data-bind="visible: hasSongs">Songs from the year <span data-bind="text: selectedYear" /></p>
     <table data-bind="visible: hasSongs" style="float:left; width:80%">
         <thead>
             <tr>
@@ -94,6 +96,8 @@
         self.ageInputVisible = ko.observable( "true" );
         self.birthYear       = ko.observable("1973");
         self.songs           = ko.observableArray( [] );
+        self.userMessage     = ko.observable( "" );
+        self.selectedYear    = ko.observable( "" );
         self.artistSortOrder = 0;
         self.songSortOrder   = 0;
 
@@ -101,10 +105,35 @@
             return self.songs().length > 0;
          }, self );
 
+        self.displayMessage = function( msg ){
+            var notice = '<div class="notice">'
+                  + '<div class="notice-body">' 
+                    + '<img src="./images/info.png" alt="" />'
+                    + '<h3>Notification</h3>'
+                    + '<p>' + msg + '</p>'
+                  + '</div>'
+                  + '<div class="notice-bottom">'
+                  + '</div>'
+                + '</div>';
+                
+            $( notice ).purr( {
+                usingTransparentPNG: true
+              }
+            );
+        }
+
         self.onEnterAge = function( ){
           self.ageInputVisible( false );
           var year = parseInt( self.birthYear( ) );
+
+          if ( isNaN( year ) 
+            || year < 1958 ){
+            year = 1958;
+            self.displayMessage( "Unfortunately your birthyear is out of our range, we set it to 1958 - the year when Elvis was drafted in the Army." );
+          }
+
           year = year + parseInt( $( "#amount" ).val( ) ); 
+          self.selectedYear( year );
           var theUrl = "http://mychildhoodmusic.isproject.is/music/get-top-songs-by-year/year/" + year;
       
           $.ajax( { 
@@ -233,6 +262,9 @@
               self.isPlaying( true );
 
               DZ.player.playTracks( [ result.id ] );
+            }
+            else{
+              self.displayMessage( "Sorry, but this song is unfortunately not available." );
             }
           });
           // http://developer.echonest.com/api/v4/artist/hotttnesss?api_key=FILDTEOIK2HBORODV&name=lady+gaga&format=jsonp&callback=myJsonpCallback
