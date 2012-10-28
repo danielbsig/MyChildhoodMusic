@@ -54,7 +54,7 @@
             <td data-bind="text: song"></td>
             <td data-bind="text: performer"></td>
             <!--<td><button data-bind="click: $root.onListen">Listen</button></td>-->
-            <td><button data-bind="click: $root.findSimilarArtists">Similar Artists</button></td>
+            <td><button data-bind="click: $root.findArtistBio">Bio</button></td>
           </tr>
         </tbody>
     </table>
@@ -118,18 +118,32 @@
           $.getJSON( url, function( obj ){
             if( obj.response.artists.length > 0){
               for (var i = 0; i <= obj.response.artists.length - 1; i++) {
-                //console.log(obj.response.artists[i]);
+                //Add the Artists to the view for dispay
+                self.findArtistSongs( obj.response.artists[i].id );
               };
             }
           });
         }
 
+        self.findArtistSongs = function( artist ){
+          var url = "http://developer.echonest.com/api/v4/song/search?api_key=FILDTEOIK2HBORODV&artist_id=" + artist + "&song_min_hotttnesss=.4&results=5";
+          $.getJSON( url, function( obj ){
+            if(obj.response.songs.length > 0){
+              for( var i = 0; i <= obj.response.songs.length - 1; i++ ){
+                //Search for the song on Deezer
+                var url = "http://api.deezer.com/2.0/search?q=" + artist + replaceSpaces( obj.response.songs[i].title ) + "&output=jsonp&callback=?";
+                //Add the song to a playlist and play the song
+              }
+            }
+          });
+        }
+
         self.findArtistBio = function( song ){
-          var params = replaceSpaces( song.performer );
+          var params = replaceSpaces( song.performer() );
           var url = "http://developer.echonest.com/api/v4/artist/biographies?api_key=FILDTEOIK2HBORODV&name=" + params + "&format=json&results=1&start=0&license=cc-by-sa";
           $.getJSON( url, function( obj ){
-            if(obj.data.length > 0){
-              //Display the bio
+            if(obj.response.biographies.length > 0){
+              console.log( obj.response.biographies[0] );
             }
           });
         }
