@@ -245,3 +245,15 @@ a {
 .cf {
   zoom:1;
 }
+
+#slider-range-max{
+  width: 470px;
+}
+
+input#amount{
+  background: #151515 url("../images/bkg.png") 0 0;
+  color: rgb(181, 232, 83);
+  border: 0;
+  font-weight: bold;
+  font-size: 16px;
+}
