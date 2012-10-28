@@ -57,8 +57,9 @@
             <td data-bind="text: song"></td>
             <td data-bind="text: performer"></td>
             <td>
-              <button data-bind="click: $root.onListen">Listen</button>
+              <button data-bind="click: $root.onListen"><img alt="Play" src="images/play_rollover.png"/></button>
               <button data-bind="click: $root.dislike">Not my cup of tea</button>
+              <button data-bind="click: $root.like">Like it!</button>
             </td>
           </tr>
         </tbody>
@@ -95,7 +96,7 @@
         self.onEnterAge = function( ){
           self.ageInputVisible( false );
           var year = parseInt( self.birthYear( ) );
-          year = year + parseInt( $( "#amount" ).val( ui.value ) ); 
+          year = year + parseInt( $( "#amount" ).val( ) ); 
           var theUrl = "http://mychildhoodmusic.isproject.is/music/get-top-songs-by-year/year/" + year;
       
           $.ajax( { 
@@ -129,11 +130,11 @@
               };
             }
           });
-        }
+        };
 
-        self.findArtistSongs = funtion( artist ){
+        self.findArtistSongs = function( artist ){
           var url = "http://developer.echonest.com/api/v4/song/search?api_key=FILDTEOIK2HBORODV&artist_id=" + artist + "&song_min_hotttnesss=.4&results=5";
-        }
+        };
 
         self.findArtistBio = function( song ){
           var params = replaceSpaces( song.performer );
@@ -143,7 +144,7 @@
               //Display the bio
             }
           });
-        }
+        };
 
         self.onListen = function( song ){
           var params = replaceSpaces( song.performer( ) ) + "+" + replaceSpaces( song.song( ) );
