@@ -43,8 +43,8 @@
       <button data-bind="click: onEnterAge">Submit</button>
     </div>
 
-<div id="main" style="display:table-row">
-    <table data-bind="visible: hasSongs" style="display:table-cell">
+<div id="main" style="width: 100%">
+    <table data-bind="visible: hasSongs" style="float:left; width:80%">
         <thead>
             <tr>
                 <th>Song</th>
@@ -66,11 +66,9 @@
         </tbody>
     </table>
 
-    <div id="dzPlayer" data-bind="visible: isPlaying" style="display:table-cell">
+    <div id="dzPlayer" data-bind="visible: isPlaying" style="float:right; width:20%; height: 800px;">
     </div>
-
 </div>
-
 
     <script type="text/javascript">
 
@@ -190,14 +188,14 @@
     </script>
     <div id="dz-root"></div>
     <script src="http://cdn-files.deezer.com/js/min/dz.js"></script>
-    <script>
+    <script type="text/javascript">
       DZ.init({
         appId  : '107931',
         channelUrl : 'http://danielbsig.github.com/MyChildhoodMusic/deezer.html',
         player: {
           container: "dzPlayer",
           cover : true,
-          width: 200
+          width: 200,
           format: "vertical",
           onload : function(){}
         }
