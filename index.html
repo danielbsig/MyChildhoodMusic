@@ -128,6 +128,10 @@
           });
         }
 
+        self.findArtistSongs = funtion( artist ){
+          var url = "http://developer.echonest.com/api/v4/song/search?api_key=FILDTEOIK2HBORODV&artist_id=" + artist + "&song_min_hotttnesss=.4&results=5";
+        }
+
         self.findArtistBio = function( song ){
           var params = replaceSpaces( song.performer );
           var url = "http://developer.echonest.com/api/v4/artist/biographies?api_key=FILDTEOIK2HBORODV&name=" + params + "&format=json&results=1&start=0&license=cc-by-sa";
