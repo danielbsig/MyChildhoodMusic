@@ -47,7 +47,7 @@
     <table data-bind="visible: hasSongs" style="float:left; width:80%">
         <thead>
             <tr>
-                <th>Song</th>
+                <th><a href="#" data-bind="click: sortBySongs">Song</a></th>
                 <th><a href="#" data-bind="click: sortByArtists">Artist</a></th>
                 <th>Operations</th>
             </tr>
@@ -94,6 +94,8 @@
         self.ageInputVisible = ko.observable( "true" );
         self.birthYear       = ko.observable("1973");
         self.songs           = ko.observableArray( [] );
+        self.artistSortOrder = 0;
+        self.songSortOrder   = 0;
 
         self.hasSongs  = ko.computed( function( ){
             return self.songs().length > 0;
@@ -135,10 +137,39 @@
         };
 
         self.sortByArtists = function(){
+          if ( self.artistSortOrder == 0 ){
+              self.artistSortOrder = 1;
+          }
+          else{
+            self.artistSortOrder = 0;
+          }
+
           self.songs.sort(function( left, right ){
-            return left.performer().toLowerCase() === right.performer().toLowerCase() ? 0 : ( left.performer().toLowerCase() < right.performer().toLowerCase() ? -1 : 1 );
+            var result = left.performer().toLowerCase() === right.performer().toLowerCase() ? 0 : ( left.performer().toLowerCase() < right.performer().toLowerCase() ? -1 : 1 );
+
+            if ( self.artistSortOrder == 0 ){
+              result = -result;
+            }
+            return result;
           });
-        }
+        };
+
+        self.sortBySongs = function(){
+          if ( self.songSortOrder == 0 ){
+              self.songSortOrder = 1;
+          }
+          else{
+            self.songSortOrder = 0;
+          }
+
+          self.songs.sort( function( left, right ){
+            var result = left.song().toLowerCase() === right.song().toLowerCase() ? 0 : ( left.song().toLowerCase() < right.song().toLowerCase() ? -1 : 1 );
+            if ( self.songSortOrder == 0 ){
+              result = -result;
+            }
+            return result;
+          });
+        };
 
         self.findSimilarArtists = function( song ){
           var params = replaceSpaces( song.performer( ) );
