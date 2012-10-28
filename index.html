@@ -120,19 +120,16 @@
         };
 
         self.findSimilarArtists = function( song ){
-          var params = replaceSpaces( song.performer() );
+          var params = replaceSpaces( song.performer );
           var url = "http://developer.echonest.com/api/v4/artist/similar?api_key=FILDTEOIK2HBORODV&name=" + params + "&format=json&results=10&start=0&min_familiarity=.7";
           $.getJSON( url, function( obj ){
-            if( obj.response.artists.length > 0){
-              for (var i = 0; i <= obj.response.artists.length - 1; i++) {
-                //console.log(obj.response.artists[i]);
+            console.log(obj);
+            if( obj.data.length > 0){
+              for (var i = 0; i <= obj.data.length - 1; i++) {
+                console.log(obj.data[i]);
               };
             }
           });
-        }
-
-        self.findArtistSongs = funtion( artist ){
-          var url = "http://developer.echonest.com/api/v4/song/search?api_key=FILDTEOIK2HBORODV&artist_id=" + artist + "&song_min_hotttnesss=.4&results=5";
         }
 
         self.findArtistBio = function( song ){
