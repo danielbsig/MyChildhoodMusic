@@ -6,14 +6,12 @@
 
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
     <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.9.0/themes/dark-hive/jquery-ui.css" />
 
     <script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.9.0/jquery-ui.js"></script>
 
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.1.0.js"></script>
-    <script src="http://cdn-files.deezer.com/js/min/dz.js"></script>
     <title>My Childhood Music</title>
   </head>
 
@@ -55,13 +53,11 @@
           <tr>
             <td data-bind="text: song"></td>
             <td data-bind="text: performer"></td>
-            <td><button data-bind="click: $root.onListen">Listen</button></td>
-            <td><button data-bind="click: $root.onRadio">Radio</button></td>
+            <!--<td><button data-bind="click: $root.onListen">Listen</button></td>-->
+            <td><button data-bind="click: $root.findSimilarArtists">Similar Artists</button></td>
           </tr>
         </tbody>
     </table>
-
-    <div id="dzPlayer" data-bind="visible: isPlaying">
     </div>
 
     <script type="text/javascript">
@@ -92,9 +88,9 @@
         self.onEnterAge = function( ){
           self.ageInputVisible( false );
           var year = parseInt( self.birthYear( ) );
-          year = year + parseInt( $( "#amount" ).val( ui.value ) ); 
+          year = year + parseInt($( "#amount" ).val()); 
           var theUrl = "http://mychildhoodmusic.isproject.is/music/get-top-songs-by-year/year/" + year;
-      
+    
           $.ajax( { 
             type: "GET",
             contentType: "application/json; charset=utf-8",
@@ -170,19 +166,6 @@
 
       ko.applyBindings( new ViewModel( ) );
 
-    </script>
-    <div id="dz-root"></div>
-    <script src="http://cdn-files.deezer.com/js/min/dz.js"></script>
-    <script>
-      DZ.init({
-        appId  : '107931',
-        channelUrl : 'http://danielbsig.github.com/MyChildhoodMusic/deezer.html',
-        player: {
-          container: "dzPlayer",
-          cover : true,
-          onload : function(){}
-        }
-      });
-    </script>   
+    </script>  
   </body>
 </html>
